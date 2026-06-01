@@ -1,0 +1,2 @@
+# No additional Python packages are required for the default updater flow.
+# tkinter must be available in the Python installation you use to run the GUI.
