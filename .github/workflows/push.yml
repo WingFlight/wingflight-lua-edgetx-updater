@@ -86,19 +86,19 @@ jobs:
         if: runner.os == 'macOS'
         working-directory: src
         run: |
-          python -m PyInstaller --onefile update_radio_gui.py --name update_radio_gui --windowed --icon icon.icns --add-data logo.png:.
+          python -m PyInstaller --onefile update_radio_gui.py --name rotorflight-lua-edgetx-updater --windowed --icon icon.icns --add-data logo.png:.
 
       - name: Build updater (Windows)
         if: runner.os == 'Windows'
         working-directory: src
         run: |
-          python -m PyInstaller --onefile --noupx update_radio_gui.py --name update_radio_gui --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;."
+          python -m PyInstaller --onefile --noupx update_radio_gui.py --name rotorflight-lua-edgetx-updater --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;."
 
       - name: Build updater (Linux)
         if: runner.os == 'Linux'
         working-directory: src
         run: |
-          python -m PyInstaller --onefile update_radio_gui.py --name update_radio_gui --add-data logo.png:.
+          python -m PyInstaller --onefile update_radio_gui.py --name rotorflight-lua-edgetx-updater --add-data logo.png:.
 
       - name: Package updater (macOS)
         if: runner.os == 'macOS'
@@ -107,10 +107,10 @@ jobs:
           ART_NAME="rotorflight-lua-edgetx-updater-${GIT_VER}-${OS_NAME}-${ARCH_NAME}.zip"
           ART_PATH="dist/${ART_NAME}"
           mkdir -p dist
-          if [ -d "src/dist/update_radio_gui.app" ]; then
-            (cd src && zip -q -r "../${ART_PATH}" dist/update_radio_gui.app)
+          if [ -d "src/dist/rotorflight-lua-edgetx-updater.app" ]; then
+            (cd src && zip -q -r "../${ART_PATH}" dist/rotorflight-lua-edgetx-updater.app)
           else
-            (cd src && zip -q -r "../${ART_PATH}" dist/update_radio_gui)
+            (cd src && zip -q -r "../${ART_PATH}" dist/rotorflight-lua-edgetx-updater)
           fi
           echo "ART_NAME=${ART_NAME}" >> $GITHUB_ENV
           echo "ART_PATH=${ART_PATH}" >> $GITHUB_ENV
@@ -122,7 +122,7 @@ jobs:
           $artName = "rotorflight-lua-edgetx-updater-$env:GIT_VER-$env:OS_NAME-$env:ARCH_NAME.zip"
           $artPath = "dist\\$artName"
           New-Item -ItemType Directory -Path dist -Force | Out-Null
-          Compress-Archive -Path "src\\dist\\update_radio_gui.exe" -DestinationPath $artPath -Force
+          Compress-Archive -Path "src\\dist\\rotorflight-lua-edgetx-updater.exe" -DestinationPath $artPath -Force
           "ART_NAME=$artName" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "ART_PATH=$artPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
@@ -133,7 +133,7 @@ jobs:
           ART_NAME="rotorflight-lua-edgetx-updater-${GIT_VER}-${OS_NAME}-${ARCH_NAME}.zip"
           ART_PATH="dist/${ART_NAME}"
           mkdir -p dist
-          (cd src && zip -q -r "../${ART_PATH}" dist/update_radio_gui)
+          (cd src && zip -q -r "../${ART_PATH}" dist/rotorflight-lua-edgetx-updater)
           echo "ART_NAME=${ART_NAME}" >> $GITHUB_ENV
           echo "ART_PATH=${ART_PATH}" >> $GITHUB_ENV
 

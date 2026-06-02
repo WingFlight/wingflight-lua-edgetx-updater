@@ -18,9 +18,9 @@ VSVersionInfo(
           StringStruct('CompanyName', 'Rotorflight'),
           StringStruct('FileDescription', 'Rotorflight EdgeTX/OpenTX Updater'),
           StringStruct('FileVersion', '{FILEVER_STR}'),
-          StringStruct('InternalName', 'update_radio_gui'),
+          StringStruct('InternalName', 'rotorflight-lua-edgetx-updater'),
           StringStruct('LegalCopyright', 'Copyright (C) 2025 Rotorflight Project'),
-          StringStruct('OriginalFilename', 'update_radio_gui.exe'),
+          StringStruct('OriginalFilename', 'rotorflight-lua-edgetx-updater.exe'),
           StringStruct('ProductName', 'Rotorflight EdgeTX/OpenTX Updater'),
           StringStruct('ProductVersion', '{PRODVER_STR}')
         ]
