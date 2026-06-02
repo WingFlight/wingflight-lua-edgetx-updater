@@ -1154,13 +1154,22 @@ class UpdaterGUI:
             except Exception:
                 pass
 
+    def _is_preserved_stale_file(self, rel, dst_root):
+        rel_norm = rel.replace("\\", "/").lower()
+        dst_name = os.path.basename(os.path.normpath(dst_root)).lower()
+        return dst_name == "rf2" and rel_norm == "settings.lua"
+
     def remove_stale_files_with_progress(self, src, dst):
         if not os.path.isdir(dst):
             return True
 
         src_files = self._build_rel_file_map(src)
         dst_files = self._build_rel_file_map(dst)
-        stale = [rel for rel in dst_files.keys() if rel not in src_files]
+        stale = [
+            rel
+            for rel in dst_files.keys()
+            if rel not in src_files and not self._is_preserved_stale_file(rel, dst)
+        ]
         total_stale = len(stale)
         self.log(f"  Total stale files to delete: {total_stale}")
 
