@@ -51,7 +51,7 @@ Compilation requirements:
 2. Python 3.x on PATH
 3. PyInstaller installed: `pip install pyinstaller`
 4. From `src`, run: `make.cmd`
-5. Output EXE: `src/update_radio_gui.exe`
+5. Output EXE: `rotorflight-lua-edgetx-updater.exe`
 
 Optional build inputs:
 

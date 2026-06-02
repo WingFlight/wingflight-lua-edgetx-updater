@@ -2,6 +2,8 @@
 setlocal
 cd /d %~dp0
 
+if not defined UPDATER_VERSION set UPDATER_VERSION=1.0.7
+
 echo [1/6] Checking for pyinstaller...
 pyinstaller --version >nul 2>&1
 if errorlevel 1 (
@@ -9,24 +11,24 @@ if errorlevel 1 (
     pip install pyinstaller || goto :error
 )
 
-echo [2/6] Generating version info...
+echo [2/6] Generating version info (%UPDATER_VERSION%)...
 python gen_version_info.py || goto :error
 
 echo [3/6] Compiling update_radio_gui.py to standalone EXE...
-python -m PyInstaller --onefile --noupx update_radio_gui.py --name update_radio_gui --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;." || goto :error
+python -m PyInstaller --onefile --noupx update_radio_gui.py --name rotorflight-lua-edgetx-updater --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;." || goto :error
 
-echo [4/6] Moving update_radio_gui.exe into parent folder...
-if exist ..\update_radio_gui.exe (
-    del ..\update_radio_gui.exe
+echo [4/6] Moving rotorflight-lua-edgetx-updater.exe into parent folder...
+if exist ..\rotorflight-lua-edgetx-updater.exe (
+    del ..\rotorflight-lua-edgetx-updater.exe
 )
-move /Y dist\update_radio_gui.exe ..\update_radio_gui.exe >nul
+move /Y dist\rotorflight-lua-edgetx-updater.exe ..\rotorflight-lua-edgetx-updater.exe >nul
 
 echo [5/6] Cleaning up build tree...
 rd /s /q build
 rd /s /q dist
-del /q update_radio_gui.spec
+del /q rotorflight-lua-edgetx-updater.spec
 
-echo [6/6] ✅ Build complete. update_radio_gui.exe is ready at: ..\update_radio_gui.exe
+echo [6/6] ✅ Build complete. rotorflight-lua-edgetx-updater.exe is ready at: ..\rotorflight-lua-edgetx-updater.exe
 goto :eof
 
 :error

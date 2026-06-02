@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 0, 6, 0),
-    prodvers=(1, 0, 6, 0),
+    filevers=(1, 0, 7, 0),
+    prodvers=(1, 0, 7, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x4,
@@ -16,13 +16,13 @@ VSVersionInfo(
         '040904B0',
         [
           StringStruct('CompanyName', 'Rotorflight'),
-          StringStruct('FileDescription', 'Rotorflight Updater'),
-          StringStruct('FileVersion', '1.0.6.0'),
-          StringStruct('InternalName', 'update_radio_gui'),
+          StringStruct('FileDescription', 'Rotorflight EdgeTX/OpenTX Updater'),
+          StringStruct('FileVersion', '1.0.7.0'),
+          StringStruct('InternalName', 'rotorflight-lua-edgetx-updater'),
           StringStruct('LegalCopyright', 'Copyright (C) 2025 Rotorflight Project'),
-          StringStruct('OriginalFilename', 'update_radio_gui.exe'),
-          StringStruct('ProductName', 'Rotorflight Updater'),
-          StringStruct('ProductVersion', '1.0.6.0')
+          StringStruct('OriginalFilename', 'rotorflight-lua-edgetx-updater.exe'),
+          StringStruct('ProductName', 'Rotorflight EdgeTX/OpenTX Updater'),
+          StringStruct('ProductVersion', '1.0.7.0')
         ]
       )
     ]),
