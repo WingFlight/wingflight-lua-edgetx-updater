@@ -10,9 +10,9 @@ def main(args):
 
     with open(inputfile) as input:
         for line in input:
-            if line.startswith('# '):
-                found = line.strip() == '# ' + release
-            elif line.startswith('***'):
+            if line.startswith('## '):
+                found = line.strip() == '## ' + release
+            elif found and line.startswith('#'):
                 found = False
             elif found:
                 sys.stdout.write(line)

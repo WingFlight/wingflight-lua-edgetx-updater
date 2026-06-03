@@ -1,8 +1,7 @@
 # Rotorflight Lua EdgeTX/OpenTX Updater Release Notes
 
-## 1.0.7
-- Updater executable and macOS app names are now unique to the EdgeTX/OpenTX updater.
+## 1.0.0
+- Initial release of the standalone Rotorflight Lua EdgeTX/OpenTX updater, with packaged updater builds for installing release, snapshot, and development Lua versions on EdgeTX/OpenTX radios.
 
 ## Unreleased
-- Initial extraction of updater into its own repository.
 
