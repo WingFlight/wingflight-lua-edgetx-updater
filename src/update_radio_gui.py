@@ -733,7 +733,7 @@ class UpdaterGUI:
             return
         confirmed = messagebox.askyesno(
             "Delete Cache",
-            "Delete cached downloads and cached master sparse checkout?\n\n"
+            "Delete cached downloads and cached branch sparse checkouts?\n\n"
             "This will force fresh network fetches on the next update.",
         )
         if not confirmed:
@@ -1304,12 +1304,15 @@ class UpdaterGUI:
                 "display_name": "Master",
                 "tag_name": "master",
                 "download_url": f"{GITHUB_REPO_URL}/archive/refs/heads/master.zip",
+                "repo_url": GITHUB_REPO_URL,
                 "is_asset": False,
                 "version_type": VERSION_MASTER,
             }
         }
         release_assets_by_tag = {}
         seen_tags = set()
+        seen_branches = set()
+        seen_prs = set()
 
         def fetch_json(url):
             req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
@@ -1347,8 +1350,55 @@ class UpdaterGUI:
                 "display_name": display_name,
                 "tag_name": tag_name,
                 "download_url": asset_url,
+                "repo_url": GITHUB_REPO_URL,
                 "is_asset": is_asset,
                 "version_type": version_type,
+            }
+
+        def add_branch(branch_name):
+            if not branch_name or branch_name == "master" or branch_name in seen_branches:
+                return
+            seen_branches.add(branch_name)
+            display_name = f"Branch: {branch_name}"
+            asset_url = f"{GITHUB_REPO_URL}/archive/refs/heads/{branch_name}.zip"
+            version_list[display_name] = {
+                "display_name": display_name,
+                "tag_name": branch_name,
+                "download_url": asset_url,
+                "repo_url": GITHUB_REPO_URL,
+                "is_asset": False,
+                "version_type": VERSION_MASTER,
+            }
+
+        def add_pr_branch(pr):
+            head = pr.get("head") or {}
+            branch = head.get("ref", "")
+            head_repo = head.get("repo")
+            if not branch or not head_repo:
+                # Source fork/branch no longer exists (deleted); nothing installable.
+                return
+            repo_full_name = head_repo.get("full_name", "")
+            if not repo_full_name:
+                return
+            pr_key = f"{repo_full_name}#{branch}"
+            if pr_key in seen_prs:
+                return
+            seen_prs.add(pr_key)
+
+            number = pr.get("number")
+            title = (pr.get("title") or "").strip()
+            if len(title) > 40:
+                title = title[:37] + "..."
+            display_name = f"PR #{number}: {title}" if title else f"PR #{number}: {branch}"
+            repo_url = f"https://github.com/{repo_full_name}"
+            asset_url = f"{repo_url}/archive/refs/heads/{branch}.zip"
+            version_list[display_name] = {
+                "display_name": display_name,
+                "tag_name": branch,
+                "download_url": asset_url,
+                "repo_url": repo_url,
+                "is_asset": False,
+                "version_type": VERSION_MASTER,
             }
 
         def add_development_commits():
@@ -1371,6 +1421,7 @@ class UpdaterGUI:
                         "display_name": display_name,
                         "tag_name": f"commit-{sha7}",
                         "download_url": f"{GITHUB_REPO_URL}/archive/{sha}.zip",
+                        "repo_url": GITHUB_REPO_URL,
                         "is_asset": False,
                         "version_type": VERSION_MASTER,
                     }
@@ -1389,20 +1440,40 @@ class UpdaterGUI:
             tags = fetch_json(f"{GITHUB_API_URL}/tags?per_page=100")
             for tag in tags:
                 add_tag(tag.get("name", ""))
-
-            add_development_commits()
         except Exception as e:
             self.log(f"⚠ Failed to fetch version list: {e}")
             self.log("  Falling back to master branch")
+
+        try:
+            self.log("Fetching branches...")
+            branches = fetch_json(f"{GITHUB_API_URL}/branches?per_page=100")
+            for branch in branches:
+                add_branch(branch.get("name", ""))
+        except Exception as e:
+            self.log(f"⚠ Failed to fetch branch list: {e}")
+
+        try:
+            self.log("Fetching open pull requests...")
+            prs = fetch_json(f"{GITHUB_API_URL}/pulls?state=open&per_page=100")
+            for pr in prs:
+                add_pr_branch(pr)
+        except Exception as e:
+            self.log(f"⚠ Failed to fetch pull request list: {e}")
+
+        add_development_commits()
 
         return version_list
 
     def get_download_url_and_name(self):
         selected = self.version_list.get(self.version_combo.get())
-        if selected is not None:
-            return selected["download_url"], selected["tag_name"], selected["is_asset"]
-        fallback = self.version_list["Master"]
-        return fallback["download_url"], fallback["tag_name"], fallback["is_asset"]
+        if selected is None:
+            selected = self.version_list["Master"]
+        return (
+            selected["download_url"],
+            selected["tag_name"],
+            selected["is_asset"],
+            selected.get("repo_url", GITHUB_REPO_URL),
+        )
 
     def is_git_available(self):
         try:
@@ -1417,14 +1488,17 @@ class UpdaterGUI:
         except Exception:
             return False
 
-    def sparse_checkout_master(self, dest_dir):
+    def sparse_checkout_branch(self, dest_dir, branch="master", repo_url=None):
         if not self.is_git_available():
             self.log("⚠ Git not available; falling back to ZIP download")
             return False
 
-        cache_repo = WORK_DIR / CACHE_DIRNAME / "master_sparse_repo"
+        repo_url = repo_url or GITHUB_REPO_URL
+        safe_repo = re.sub(r"[^A-Za-z0-9._-]+", "_", repo_url.replace("https://github.com/", ""))
+        safe_branch = re.sub(r"[^A-Za-z0-9._-]+", "_", branch)
+        cache_repo = WORK_DIR / CACHE_DIRNAME / "branch_sparse_repo" / safe_repo / safe_branch
         os.makedirs(cache_repo, exist_ok=True)
-        self.log(f"Using git sparse cache for master: {cache_repo}")
+        self.log(f"Using git sparse cache for '{repo_url}' branch '{branch}': {cache_repo}")
 
         def run_git(args, cwd, timeout=60, progress_cb=None):
             cmd = ["git"] + args
@@ -1490,7 +1564,7 @@ class UpdaterGUI:
             if init.returncode != 0:
                 self.log(f"⚠ Git init failed: {init.stderr.strip()}")
                 return False
-            add_origin = run_git(["remote", "add", "origin", GITHUB_REPO_URL + ".git"], cwd=str(cache_repo))
+            add_origin = run_git(["remote", "add", "origin", repo_url + ".git"], cwd=str(cache_repo))
             if add_origin.returncode != 0:
                 self.log(f"⚠ Git remote add failed: {add_origin.stderr.strip()}")
                 return False
@@ -1505,16 +1579,16 @@ class UpdaterGUI:
             f.write("src/WIDGETS/\n")
 
         fetch = run_git(
-            ["fetch", "--depth", "1", "--progress", "origin", "master"],
+            ["fetch", "--depth", "1", "--progress", "origin", branch],
             cwd=str(cache_repo),
             timeout=180,
-            progress_cb=lambda pct: self.update_progress(pct, f"Fetching master... {pct}%"),
+            progress_cb=lambda pct: self.update_progress(pct, f"Fetching {branch}... {pct}%"),
         )
         cache_ready = False
         if fetch.returncode != 0:
             self.log(f"⚠ Git fetch failed: {fetch.stderr.strip()}")
             if os.path.isdir(os.path.join(cache_repo, "src", "SCRIPTS")):
-                self.log("⚠ Using previously cached master snapshot.")
+                self.log(f"⚠ Using previously cached '{branch}' snapshot.")
                 cache_ready = True
             else:
                 return False
@@ -1709,17 +1783,17 @@ class UpdaterGUI:
             self.log("  No changed shared-namespace files detected.")
         return True
 
-    def get_master_commit_suffix(self):
+    def get_branch_commit_suffix(self, branch="master"):
         try:
-            req = Request(f"{GITHUB_API_URL}/commits/master", headers={"User-Agent": "Mozilla/5.0"})
+            req = Request(f"{GITHUB_API_URL}/commits/{branch}", headers={"User-Agent": "Mozilla/5.0"})
             with self.urlopen_insecure(req, timeout=DOWNLOAD_TIMEOUT) as response:
                 data = json.loads(response.read().decode())
                 sha = data.get("sha", "")
                 if sha:
                     return sha[:7]
         except Exception as e:
-            self.log(f"⚠ Failed to fetch master commit SHA: {e}")
-        return "master"
+            self.log(f"⚠ Failed to fetch '{branch}' commit SHA: {e}")
+        return branch
 
     def derive_version_label(self, version_type, version_name):
         if version_name.startswith("release/"):
@@ -1729,7 +1803,9 @@ class UpdaterGUI:
         if version_type == VERSION_MASTER:
             if version_name.startswith("commit-"):
                 return version_name
-            return f"master-{self.get_master_commit_suffix()}"
+            if version_name and version_name != "master":
+                return f"branch-{version_name}"
+            return f"master-{self.get_branch_commit_suffix('master')}"
         return version_name or "master"
 
     def read_rf2_lua_version(self, rf2_lua_path):
@@ -1763,6 +1839,8 @@ class UpdaterGUI:
         base = re.sub(r"-master-[0-9a-f]{7}$", "", current)
         if re.match(r".+-commit-[0-9a-f]{7}$", current):
             base = re.sub(r"-commit-[0-9a-f]{7}$", "", current)
+        if re.match(r".+-branch-.+$", current):
+            base = re.sub(r"-branch-.+$", "", current)
         if current.endswith(version_label):
             new_value = current
         else:
@@ -1831,7 +1909,7 @@ class UpdaterGUI:
             self.set_current_step("Download")
 
             version_type = self.selected_version.get()
-            download_url, version_name, is_asset = self.get_download_url_and_name()
+            download_url, version_name, is_asset, repo_url = self.get_download_url_and_name()
             if not download_url:
                 raise RuntimeError("No download URL available")
             version_label = self.derive_version_label(version_type, version_name)
@@ -1843,12 +1921,13 @@ class UpdaterGUI:
             zip_path = None
 
             repo_dir = None
-            if version_type == VERSION_MASTER and version_name == "master":
-                self.set_status("Fetching master via git...")
-                self.update_progress(0, "Fetching master via git...")
-                self.log("Git sparse checkout: src/SCRIPTS/, src/WIDGETS/")
+            if version_type == VERSION_MASTER and not version_name.startswith("commit-"):
+                branch = version_name or "master"
+                self.set_status(f"Fetching {branch} via git...")
+                self.update_progress(0, f"Fetching {branch} via git...")
+                self.log(f"Git sparse checkout: src/SCRIPTS/, src/WIDGETS/ (repo: {repo_url}, branch: {branch})")
                 repo_dir = os.path.join(temp_dir, "repo")
-                if not self.sparse_checkout_master(repo_dir):
+                if not self.sparse_checkout_branch(repo_dir, branch=branch, repo_url=repo_url):
                     repo_dir = None
                 else:
                     self.log("✓ Using sparse checkout; skipping ZIP download")
