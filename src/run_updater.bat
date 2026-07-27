@@ -1,8 +1,8 @@
 @echo off
-REM Rotorflight Lua EdgeTX/OpenTX Updater Launcher
+REM Wingflight Lua EdgeTX/OpenTX Updater Launcher
 
 echo ========================================
-echo Rotorflight EdgeTX/OpenTX Updater
+echo Wingflight EdgeTX/OpenTX Updater
 echo ========================================
 echo.
 

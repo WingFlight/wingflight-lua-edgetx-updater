@@ -15,20 +15,20 @@ echo [2/6] Generating version info (%UPDATER_VERSION%)...
 python gen_version_info.py || goto :error
 
 echo [3/6] Compiling update_radio_gui.py to standalone EXE...
-python -m PyInstaller --onefile --noupx update_radio_gui.py --name rotorflight-lua-edgetx-updater --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;." || goto :error
+python -m PyInstaller --onefile --noupx update_radio_gui.py --name wingflight-lua-edgetx-updater --windowed --version-file version_info.txt --icon icon.ico --add-data "logo.png;." || goto :error
 
-echo [4/6] Moving rotorflight-lua-edgetx-updater.exe into parent folder...
-if exist ..\rotorflight-lua-edgetx-updater.exe (
-    del ..\rotorflight-lua-edgetx-updater.exe
+echo [4/6] Moving wingflight-lua-edgetx-updater.exe into parent folder...
+if exist ..\wingflight-lua-edgetx-updater.exe (
+    del ..\wingflight-lua-edgetx-updater.exe
 )
-move /Y dist\rotorflight-lua-edgetx-updater.exe ..\rotorflight-lua-edgetx-updater.exe >nul
+move /Y dist\wingflight-lua-edgetx-updater.exe ..\wingflight-lua-edgetx-updater.exe >nul
 
 echo [5/6] Cleaning up build tree...
 rd /s /q build
 rd /s /q dist
-del /q rotorflight-lua-edgetx-updater.spec
+del /q wingflight-lua-edgetx-updater.spec
 
-echo [6/6] ✅ Build complete. rotorflight-lua-edgetx-updater.exe is ready at: ..\rotorflight-lua-edgetx-updater.exe
+echo [6/6] ✅ Build complete. wingflight-lua-edgetx-updater.exe is ready at: ..\wingflight-lua-edgetx-updater.exe
 goto :eof
 
 :error

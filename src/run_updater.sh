@@ -1,8 +1,8 @@
 #!/bin/bash
-# Rotorflight Lua EdgeTX/OpenTX Updater Launcher
+# Wingflight Lua EdgeTX/OpenTX Updater Launcher
 
 echo "========================================"
-echo "Rotorflight EdgeTX/OpenTX Updater"
+echo "Wingflight EdgeTX/OpenTX Updater"
 echo "========================================"
 echo ""
 

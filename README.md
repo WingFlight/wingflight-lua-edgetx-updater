@@ -1,11 +1,11 @@
-# Rotorflight EdgeTX/OpenTX Lua Updater
+# Wingflight EdgeTX/OpenTX Lua Updater
 
-Desktop updater for [rotorflight/rotorflight-lua-scripts](https://github.com/rotorflight/rotorflight-lua-scripts).
+Desktop updater for [WingFlight/wingflight-lua-edgetx](https://github.com/WingFlight/wingflight-lua-edgetx).
 
-It downloads Rotorflight Lua script packages from GitHub and syncs the `SCRIPTS` and `WIDGETS`
+It downloads Wingflight Lua script packages from GitHub and syncs the `SCRIPTS` and `WIDGETS`
 folders onto a mounted EdgeTX/OpenTX SD card.
 
-![Rotorflight Radio Updater](src/README.png)
+![Wingflight Radio Updater](src/README.png)
 
 ## What It Does
 
@@ -31,7 +31,7 @@ those folders are visible at the root.
 Use the GitHub Releases page for updater binaries:
 
 ```text
-https://github.com/rotorflight/rotorflight-lua-edgetx-updater/releases
+https://github.com/WingFlight/wingflight-lua-edgetx-updater/releases
 ```
 
 ## Running From Source
@@ -51,7 +51,7 @@ Compilation requirements:
 2. Python 3.x on PATH
 3. PyInstaller installed: `pip install pyinstaller`
 4. From `src`, run: `make.cmd`
-5. Output EXE: `rotorflight-lua-edgetx-updater.exe`
+5. Output EXE: `wingflight-lua-edgetx-updater.exe`
 
 Optional build inputs:
 
@@ -60,10 +60,10 @@ Optional build inputs:
 ## Install Behavior
 
 The updater is designed around the release packaging of
-`rotorflight-lua-scripts`:
+`wingflight-lua-edgetx`:
 
 - release assets contain ready-to-copy `SCRIPTS` and `WIDGETS`
 - snapshot assets do the same
 - `master` and recent development commits fall back to the repository source tree
-- only Rotorflight-owned paths are mirrored aggressively
+- only Wingflight-owned paths are mirrored aggressively
 - shared namespaces such as `SCRIPTS/TOOLS` and `SCRIPTS/FUNCTIONS` are updated file-by-file without deleting unrelated content

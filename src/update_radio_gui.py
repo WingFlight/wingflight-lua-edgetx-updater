@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Rotorflight Lua EdgeTX/OpenTX Updater
+Wingflight Lua EdgeTX/OpenTX Updater
 =====================================
-A GUI tool to update Rotorflight Lua scripts on an EdgeTX/OpenTX SD card.
+A GUI tool to update Wingflight Lua scripts on an EdgeTX/OpenTX SD card.
 
 Features:
 - Detects a mounted SD card from its folder layout
@@ -39,11 +39,9 @@ except ImportError:
     sys.exit(1)
 
 
-GITHUB_REPO_URL = "https://github.com/rotorflight/rotorflight-lua-scripts"
-GITHUB_API_URL = "https://api.github.com/repos/rotorflight/rotorflight-lua-scripts"
-UPDATER_INFO_URL = "https://github.com/rotorflight/rotorflight-lua-edgetx-updater/releases"
-LOGO_URL = "https://raw.githubusercontent.com/rotorflight/rotorflight-lua-edgetx-updater/master/src/logo.png"
-
+GITHUB_REPO_URL = "https://github.com/WingFlight/wingflight-lua-edgetx"
+GITHUB_API_URL = "https://api.github.com/repos/WingFlight/wingflight-lua-edgetx"
+UPDATER_INFO_URL = "https://github.com/WingFlight/wingflight-lua-edgetx-updater/releases"
 INSTALL_DIR_NAMES = ("SCRIPTS", "WIDGETS")
 RADIO_ROOT_HINTS = (
     "IMAGES",
@@ -92,24 +90,24 @@ RESOURCE_DIR = _get_resource_dir()
 
 def _get_work_dir():
     if sys.platform == "darwin":
-        return Path.home() / "Library" / "Application Support" / "rotorflight-edgetx-updater"
+        return Path.home() / "Library" / "Application Support" / "wingflight-edgetx-updater"
     if sys.platform.startswith("linux"):
-        return Path.home() / ".local" / "share" / "rotorflight-edgetx-updater"
+        return Path.home() / ".local" / "share" / "wingflight-edgetx-updater"
     if sys.platform == "win32":
         base = Path(os.environ.get("LOCALAPPDATA") or tempfile.gettempdir())
-        return base / "rotorflight_edgetx_updater_work"
-    return APP_DIR / "rotorflight_edgetx_updater_work"
+        return base / "wingflight_edgetx_updater_work"
+    return APP_DIR / "wingflight_edgetx_updater_work"
 
 
 WORK_DIR = _get_work_dir()
 try:
     WORK_DIR.mkdir(parents=True, exist_ok=True)
 except Exception:
-    WORK_DIR = Path(tempfile.gettempdir()) / "rotorflight_edgetx_updater_work"
+    WORK_DIR = Path(tempfile.gettempdir()) / "wingflight_edgetx_updater_work"
     WORK_DIR.mkdir(parents=True, exist_ok=True)
 
 UPDATER_SETTINGS_FILE = str(WORK_DIR / "updater_settings.json")
-UPDATER_LOCK_FILE = str(WORK_DIR / "rotorflight_edgetx_updater.lock")
+UPDATER_LOCK_FILE = str(WORK_DIR / "wingflight_edgetx_updater.lock")
 
 
 def _ensure_work_dir():
@@ -346,7 +344,7 @@ class UpdaterGUI:
 
     def __init__(self, root):
         self.root = root
-        self.root.title("Rotorflight Lua EdgeTX/OpenTX Updater")
+        self.root.title("Wingflight Lua EdgeTX/OpenTX Updater")
         self.root.geometry("800x800")
         self.root.resizable(False, False)
 
@@ -406,7 +404,7 @@ class UpdaterGUI:
 
         tk.Label(
             text_frame,
-            text="Rotorflight Lua EdgeTX/OpenTX Updater",
+            text="Wingflight Lua EdgeTX/OpenTX Updater",
             font=("Arial", 16, "bold"),
             bg=header_bg,
             fg=header_fg,
@@ -570,21 +568,6 @@ class UpdaterGUI:
         if local_logo.is_file():
             set_logo_image(local_logo)
 
-        def fetch_logo():
-            try:
-                _ensure_work_dir()
-                req = Request(LOGO_URL, headers={"User-Agent": "Mozilla/5.0"})
-                with self.urlopen_insecure(req, timeout=10) as response:
-                    logo_bytes = response.read()
-                tmp_logo = WORK_DIR / "rotorflight_edgetx_logo.png"
-                with open(tmp_logo, "wb") as f:
-                    f.write(logo_bytes)
-                self.root.after(0, lambda: set_logo_image(tmp_logo))
-            except Exception:
-                pass
-
-        self.root.after(100, lambda: threading.Thread(target=fetch_logo, daemon=True).start())
-
     def log(self, message):
         timestamp = time.strftime("%H:%M:%S")
         self.log_text.insert(tk.END, f"[{timestamp}] {message}\n")
@@ -715,7 +698,7 @@ class UpdaterGUI:
         filename = filedialog.asksaveasfilename(
             title="Save Updater Log",
             defaultextension=".txt",
-            initialfile="rotorflight_edgetx_updater_log.txt",
+            initialfile="wingflight_edgetx_updater_log.txt",
             filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")],
         )
         if not filename:
@@ -1157,7 +1140,7 @@ class UpdaterGUI:
     def _is_preserved_stale_file(self, rel, dst_root):
         rel_norm = rel.replace("\\", "/").lower()
         dst_name = os.path.basename(os.path.normpath(dst_root)).lower()
-        return dst_name == "rf2" and rel_norm == "settings.lua"
+        return dst_name == "wf" and rel_norm == "settings.lua"
 
     def remove_stale_files_with_progress(self, src, dst):
         if not os.path.isdir(dst):
@@ -1325,11 +1308,11 @@ class UpdaterGUI:
             if tag_name.startswith("release/"):
                 version_type = VERSION_RELEASE
                 display_prefix = "Release"
-                asset_prefix = "rotorflight-lua-scripts"
+                asset_prefix = "wingflight-lua-edgetx"
             elif tag_name.startswith("snapshot/"):
                 version_type = VERSION_SNAPSHOT
                 display_prefix = "Snapshot"
-                asset_prefix = "rotorflight-lua-scripts-snapshot"
+                asset_prefix = "wingflight-lua-edgetx-snapshot"
             else:
                 return
 
@@ -1693,7 +1676,7 @@ class UpdaterGUI:
         """
         Build a conservative install plan.
 
-        We fully own dedicated namespaces like SCRIPTS/RF2 and widget folders,
+        We fully own dedicated namespaces like SCRIPTS/WF and widget folders,
         but only copy individual files into shared namespaces like
         SCRIPTS/TOOLS and SCRIPTS/FUNCTIONS.
         """
@@ -1808,31 +1791,31 @@ class UpdaterGUI:
             return f"master-{self.get_branch_commit_suffix('master')}"
         return version_name or "master"
 
-    def read_rf2_lua_version(self, rf2_lua_path):
+    def read_wf_lua_version(self, wf_lua_path):
         try:
-            with open(rf2_lua_path, "r", encoding="utf-8") as f:
+            with open(wf_lua_path, "r", encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
-            self.log(f"⚠ Unable to read rf2.lua for version info: {e}")
+            self.log(f"⚠ Unable to read wf.lua for version info: {e}")
             return None
 
         match = re.search(r'luaVersion\s*=\s*"([^"]+)"', content)
         if not match:
-            self.log("⚠ Could not parse luaVersion from rf2.lua")
+            self.log("⚠ Could not parse luaVersion from wf.lua")
             return None
         return match.group(1)
 
-    def update_rf2_lua_version(self, rf2_lua_path, version_label):
+    def update_wf_lua_version(self, wf_lua_path, version_label):
         try:
-            with open(rf2_lua_path, "r", encoding="utf-8") as f:
+            with open(wf_lua_path, "r", encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
-            self.log(f"⚠ Unable to read rf2.lua for version update: {e}")
+            self.log(f"⚠ Unable to read wf.lua for version update: {e}")
             return False
 
         match = re.search(r'(luaVersion\s*=\s*")([^"]+)(")', content)
         if not match:
-            self.log("⚠ luaVersion pattern not found in rf2.lua")
+            self.log("⚠ luaVersion pattern not found in wf.lua")
             return False
 
         current = match.group(2)
@@ -1848,12 +1831,12 @@ class UpdaterGUI:
 
         updated = re.sub(r'(luaVersion\s*=\s*")([^"]+)(")', rf"\g<1>{new_value}\g<3>", content, count=1)
         try:
-            with open(rf2_lua_path, "w", encoding="utf-8") as f:
+            with open(wf_lua_path, "w", encoding="utf-8") as f:
                 f.write(updated)
-            self.log(f"✓ Updated rf2.lua version to '{new_value}'")
+            self.log(f"✓ Updated wf.lua version to '{new_value}'")
             return True
         except Exception as e:
-            self.log(f"⚠ Unable to write rf2.lua version update: {e}")
+            self.log(f"⚠ Unable to write wf.lua version update: {e}")
             return False
 
     def start_update(self):
@@ -1917,7 +1900,7 @@ class UpdaterGUI:
             self.log(f"Version label: {version_label}")
 
             _ensure_work_dir()
-            temp_dir = tempfile.mkdtemp(prefix="rotorflight-edgetx-update-", dir=str(WORK_DIR))
+            temp_dir = tempfile.mkdtemp(prefix="wingflight-edgetx-update-", dir=str(WORK_DIR))
             zip_path = None
 
             repo_dir = None
@@ -2040,9 +2023,9 @@ class UpdaterGUI:
             self.mark_step_done("Copy")
             self.log("✓ Files synced to SD card successfully")
 
-            rf2_lua_path = os.path.join(radio_root, "SCRIPTS", "RF2", "rf2.lua")
-            if not is_asset and os.path.isfile(rf2_lua_path):
-                self.update_rf2_lua_version(rf2_lua_path, version_label)
+            wf_lua_path = os.path.join(radio_root, "SCRIPTS", "WF", "wf.lua")
+            if not is_asset and os.path.isfile(wf_lua_path):
+                self.update_wf_lua_version(wf_lua_path, version_label)
 
             if not self.is_updating:
                 return
@@ -2065,17 +2048,17 @@ class UpdaterGUI:
             self.log("✓ UPDATE COMPLETED SUCCESSFULLY!")
             self.log("=" * 50)
             self.log("")
-            full_version = self.read_rf2_lua_version(rf2_lua_path) if os.path.isfile(rf2_lua_path) else None
+            full_version = self.read_wf_lua_version(wf_lua_path) if os.path.isfile(wf_lua_path) else None
             if full_version:
                 self.log(f"Installed version: {full_version}")
             else:
                 self.log(f"Installed version label: {version_label}")
             self.log("You can now eject the SD card or restart the radio.")
-            self.log("The new Rotorflight Lua scripts are ready to use.")
+            self.log("The new Wingflight Lua scripts are ready to use.")
 
             messagebox.showinfo(
                 "Update Complete",
-                "Rotorflight Lua scripts have been updated successfully!\n\n"
+                "Wingflight Lua scripts have been updated successfully!\n\n"
                 "You can now eject the SD card or restart the radio.",
             )
         except Exception as e:

@@ -15,13 +15,13 @@ VSVersionInfo(
       StringTable(
         '040904B0',
         [
-          StringStruct('CompanyName', 'Rotorflight'),
-          StringStruct('FileDescription', 'Rotorflight EdgeTX/OpenTX Updater'),
+          StringStruct('CompanyName', 'Wingflight'),
+          StringStruct('FileDescription', 'Wingflight EdgeTX/OpenTX Updater'),
           StringStruct('FileVersion', '1.0.1.0'),
-          StringStruct('InternalName', 'rotorflight-lua-edgetx-updater'),
-          StringStruct('LegalCopyright', 'Copyright (C) 2025 Rotorflight Project'),
-          StringStruct('OriginalFilename', 'rotorflight-lua-edgetx-updater.exe'),
-          StringStruct('ProductName', 'Rotorflight EdgeTX/OpenTX Updater'),
+          StringStruct('InternalName', 'wingflight-lua-edgetx-updater'),
+          StringStruct('LegalCopyright', 'Copyright (C) 2025 Wingflight Project'),
+          StringStruct('OriginalFilename', 'wingflight-lua-edgetx-updater.exe'),
+          StringStruct('ProductName', 'Wingflight EdgeTX/OpenTX Updater'),
           StringStruct('ProductVersion', '1.0.1.0')
         ]
       )
