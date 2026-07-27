@@ -1,8 +1,8 @@
 # UTF-8
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 0, 1, 0),
-    prodvers=(1, 0, 1, 0),
+    filevers=(1, 0, 2, 0),
+    prodvers=(1, 0, 2, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x4,
@@ -17,12 +17,12 @@ VSVersionInfo(
         [
           StringStruct('CompanyName', 'Wingflight'),
           StringStruct('FileDescription', 'Wingflight EdgeTX/OpenTX Updater'),
-          StringStruct('FileVersion', '1.0.1.0'),
+          StringStruct('FileVersion', '1.0.2.0'),
           StringStruct('InternalName', 'wingflight-lua-edgetx-updater'),
           StringStruct('LegalCopyright', 'Copyright (C) 2025 Wingflight Project'),
           StringStruct('OriginalFilename', 'wingflight-lua-edgetx-updater.exe'),
           StringStruct('ProductName', 'Wingflight EdgeTX/OpenTX Updater'),
-          StringStruct('ProductVersion', '1.0.1.0')
+          StringStruct('ProductVersion', '1.0.2.0')
         ]
       )
     ]),
