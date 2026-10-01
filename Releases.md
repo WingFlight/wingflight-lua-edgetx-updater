@@ -1,5 +1,8 @@
 # Wingflight Lua EdgeTX/OpenTX Updater Release Notes
 
+## 1.0.3
+- Version bump for release alignment; no updater-relevant changes this cycle.
+
 ## 1.0.2
 - Rebranded the updater for Wingflight, including the application title, release metadata, bundled logo, Windows icon, README image, and packaged artifact names.
 - Updated downloads to use `WingFlight/wingflight-lua-edgetx` release, snapshot, branch, pull request, and master sources.
