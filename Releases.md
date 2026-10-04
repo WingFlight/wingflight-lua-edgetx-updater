@@ -1,5 +1,8 @@
 # Wingflight Lua EdgeTX/OpenTX Updater Release Notes
 
+## 1.0.4
+- Version bump for release alignment; no updater-relevant changes this cycle.
+
 ## 1.0.3
 - Version bump for release alignment; no updater-relevant changes this cycle.
 
